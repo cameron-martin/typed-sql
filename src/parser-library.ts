@@ -21,27 +21,32 @@ export type ParseFail = { success: false };
 export type ParseLiteral<Literal extends string, S extends string> = S extends `${Literal}${infer R}` ? ParseSuccess<Literal, R> : ParseFail;
 
 /**
+ * Consumes a single character, given a union of chars.
+ */
+export type ParseChar<Chars extends string, S extends string> =
+  S extends `${infer Char}${infer R}` ?
+  (Char extends Chars ? ParseSuccess<Char, R> : ParseFail) :
+  ParseFail;
+
+/**
  * Consumes a single character of whitespace, yielding that character.
  * TODO: Add more whitespace chars
  */
-export type ParseSingleWhitespace<S extends string> =
-  S extends ` ${infer R}` ? ParseSuccess<' ', R> :
-  S extends `\t${infer R}` ? ParseSuccess<'\t', R> :
-  ParseFail;
+export type ParseSingleWhitespace<S extends string> = ParseChar<' ' | '\t', S>;
 
 /**
  * Consumes 0 or more characters of whitespace as possible, yielding the consumed whitespace.
  */
 export type ParseManyWhitespace<S extends string> =
   ParseSingleWhitespace<S> extends ParseSuccessString<infer X1, infer R0> ?
-  (ParseSingleWhitespace<R0> extends ParseSuccessString<infer X2, infer R1> ? ParseSuccess<`${X1}${X2}`, R1> : ParseSuccess<X1, R0> ) : ParseSuccess<'', S>;
+  (ParseManyWhitespace<R0> extends ParseSuccessString<infer X2, infer R1> ? ParseSuccess<`${X1}${X2}`, R1> : ParseSuccess<X1, R0> ) : ParseSuccess<'', S>;
 
 /**
  * Consumes 1 or more characters of whitespace as possible, yielding the consumed whitespace.
  */
 export type ParseMany1Whitespace<S extends string> =
   ParseSingleWhitespace<S> extends ParseSuccessString<infer X1, infer R0> ?
-  (ParseMany1Whitespace<R0> extends ParseSuccessString<infer X2, infer R1> ? ParseSuccess<`${X1}${X2}`, R1> : ParseSuccess<X1, R0>) : ParseFail;
+  (ParseManyWhitespace<R0> extends ParseSuccessString<infer X2, infer R1> ? ParseSuccess<`${X1}${X2}`, R1> : ParseSuccess<X1, R0>) : ParseFail;
 
 /**
  * Parse a string literal in single or double quotes, with backslash-escaping
