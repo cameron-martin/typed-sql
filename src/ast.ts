@@ -146,7 +146,7 @@ export type DeleteStatement<
 };
 
 export type Statement =
-  | SelectStatement
+  | SelectStatement<[], TableSpecifier<any, any>, [], Expression>
   | InsertStatement
   | UpdateStatement
   | DeleteStatement;
