@@ -13,5 +13,5 @@ interface Schema {
   }
 }
 
-new Client<Schema>.query('SELECT id, name AS username FROM users WHERE is_admin = true') // QueryResult<{ id:number, name: string }>
+new Client<Schema>.query('SELECT id, name AS username FROM users WHERE is_admin = true') // QueryResult<{ id: number, name: string }>
 ```
