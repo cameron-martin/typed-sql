@@ -55,10 +55,12 @@ export type ParseMany<Chars extends string, S extends string> =
 /**
  * Greedily consumes 1 or more characters from `Chars`, yielding the consumed whitespace.
  */
-export type ParseMany1<Chars extends string, S extends string> =
-  ParseChar<Chars, S> extends ParseSuccess<infer X1, infer R0, string> ? (
-    ParseMany1<Chars, R0> extends ParseSuccess<infer X2, infer R1, string> ? ParseSuccess<`${X1}${X2}`, R1> : ParseSuccess<X1, R0>
-  ) : ParseFail;
+export type ParseMany1<Chars extends string, S extends string> = FailIfYields<ParseMany<Chars, S>, ''>;
+
+/**
+ * Fails the parser if `ParseResult` yields `X`
+ */
+type FailIfYields<ParseResult, X> = ParseResult extends ParseSuccess<X, any> ? ParseFail : ParseResult;
 
 /**
  * Parse a string literal in single or double quotes, with backslash-escaping
