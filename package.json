@@ -11,5 +11,8 @@
   },
   "scripts": {
     "test": "jest"
+  },
+  "dependencies": {
+    "@codemix/ts-sql": "^1.0.0"
   }
 }

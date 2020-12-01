@@ -279,6 +279,11 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@codemix/ts-sql@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@codemix/ts-sql/-/ts-sql-1.0.0.tgz#e3dc3d0121209f69e4bf471cd071c5e2445561cc"
+  integrity sha512-vA+UQH9kRtFE8p5spQTq17b2KqMceQgXUG0VX42UPDfUUiFYN04j8BFd6kKRXsvdv+JWxrYcSQ5GzuJQUEd5Kg==
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"

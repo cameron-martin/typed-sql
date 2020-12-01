@@ -20,3 +20,9 @@ test('select statement with where clause', () => {
 
     expectType<TypeEqual<{ foo: number, bar: string, baz: boolean }[], typeof result>>(true);
 });
+
+test('select statement with aliasing fields statement with where clause', () => {
+    let result = new SqlClient<TestSchema>().query('SELECT foo AS foo2, bar, baz FROM users WHERE bar = "hello"');
+
+    expectType<TypeEqual<{ foo2: number, bar: string, baz: boolean }[], typeof result>>(true);
+});
