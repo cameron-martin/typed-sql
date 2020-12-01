@@ -16,9 +16,21 @@ export type ParseSuccess<X, R extends string> = { success: true, result: X, rest
 export type ParseFail = { success: false };
 
 /**
- * Consumes a literal value, yielding that value.
+ * Consumes a literal string, yielding that value.
  */
-export type ParseLiteral<Literal extends string, S extends string> = S extends `${Literal}${infer R}` ? ParseSuccess<Literal, R> : ParseFail;
+export type ParseString<Literal extends string, S extends string> = S extends `${Literal}${infer R}` ? ParseSuccess<Literal, R> : ParseFail;
+
+/**
+ * Like ParseLiteral, but matches case-insensitively. Yields the consumed string.
+ */
+export type ParseStringCaseInsensitive<Literal extends string, S extends string> =
+  Literal extends `${infer L0}${infer L1}` ? (
+    S extends `${infer S0}${infer S1}` ? (
+      Lowercase<S0> extends Lowercase<L0> ? (
+        ParseStringCaseInsensitive<L1, S1> extends ParseSuccessString<infer X1, infer R> ?  ParseSuccess<`${S0}${X1}`, R> : ParseFail
+      ) : ParseFail
+    ) : ParseFail
+  ) : ParseSuccess<'', S>;
 
 /**
  * Consumes a single character, given a union of chars.

@@ -1,4 +1,4 @@
-import { ParseSuccess, ParseFail, ParseSingleWhitespace, ParseManyWhitespace, ParseMany1Whitespace, ParseStringLiteral } from './parser-library';
+import { ParseSuccess, ParseFail, ParseSingleWhitespace, ParseManyWhitespace, ParseMany1Whitespace, ParseStringLiteral, ParseStringCaseInsensitive } from './parser-library';
 import { expectType, TypeOf, TypeEqual } from "ts-expect";
 
 describe('ParseSingleWhitespace', () => {
@@ -16,6 +16,7 @@ describe('ParseSingleWhitespace', () => {
         expectType<TypeEqual<Result, Expected>>(true);
     });
 });
+
 describe('ParseManyWhitespace', () => {
     it('parses empty string and consumes nothing if no whitespace at front', () => {
         type Result = ParseManyWhitespace<"foo ">;
@@ -109,6 +110,29 @@ describe('ParseStringLiteral', () => {
 
     it('does not parse mixed quotes', () => {
         type Result = ParseStringLiteral<'"foo\' bar'>;
+        type Expected = ParseFail;
+    
+        expectType<TypeEqual<Result, Expected>>(true);
+    });
+});
+
+describe('ParseStringCaseInsensitive', () => {
+    it('parses case insensitively', () => {
+        type Result = ParseStringCaseInsensitive<'SelecT', 'sElEcT * FROM users'>;
+        type Expected = ParseSuccess<"sElEcT", " * FROM users">;
+    
+        expectType<TypeEqual<Result, Expected>>(true);
+    });
+
+    it('parses empty string', () => {
+        type Result = ParseStringCaseInsensitive<'', 'SELECT * FROM users'>;
+        type Expected = ParseSuccess<'', "SELECT * FROM users">;
+    
+        expectType<TypeEqual<Result, Expected>>(true);
+    });
+
+    it('fails if string is not a prefix', () => {
+        type Result = ParseStringCaseInsensitive<'UPDATE', 'SELECT * FROM users'>;
         type Expected = ParseFail;
     
         expectType<TypeEqual<Result, Expected>>(true);
