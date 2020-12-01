@@ -1,32 +1,32 @@
-import { ParseSuccess, ParseFail, ParseSingleWhitespace, ParseManyWhitespace, ParseMany1Whitespace, ParseStringLiteral, ParseStringCaseInsensitive } from './parser-library';
+import { ParseSuccess, ParseFail, ParseChar, ParseMany, ParseMany1, ParseStringLiteral, ParseStringCaseInsensitive, Whitespace } from './parser-library';
 import { expectType, TypeOf, TypeEqual } from "ts-expect";
 
-describe('ParseSingleWhitespace', () => {
-    it('parses a single space from the front', () => {
-        type Result = ParseSingleWhitespace<"   ">;
+describe('ParseChar', () => {
+    it('parses a single char from the front', () => {
+        type Result = ParseChar<Whitespace, "   ">;
         type Expected = ParseSuccess<" ", "  ">;
     
         expectType<TypeEqual<Result, Expected>>(true);
     });
 
-    it('fails when string contains no whitespace at front', () => {
-        type Result = ParseSingleWhitespace<"foo">;
+    it('fails when string contains none of the characters at front', () => {
+        type Result = ParseChar<Whitespace, "foo">;
         type Expected = ParseFail;
     
         expectType<TypeEqual<Result, Expected>>(true);
     });
 });
 
-describe('ParseManyWhitespace', () => {
+describe('ParseMany', () => {
     it('parses empty string and consumes nothing if no whitespace at front', () => {
-        type Result = ParseManyWhitespace<"foo ">;
+        type Result = ParseMany<Whitespace, "foo ">;
         type Expected = ParseSuccess<"", "foo ">;
     
         expectType<TypeEqual<Result, Expected>>(true);
     });
 
     // it('parses and consumes all whitespace characters from start of string', () => {
-    //     type Result = ParseManyWhitespace<" foo bar">;
+    //     type Result = ParseMany<Whitespace, " foo bar">;
     //     type Expected = ParseSuccess<" ", "foo bar">;
     
     //     expectType<TypeEqual<Result, Expected>>(true);
