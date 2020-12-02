@@ -21,7 +21,7 @@ type ParseSelectStatement<S extends string> =
 
 // type ParseNonEmptyFields<S extends string> = 
 
-type ParseFields<S extends string> =
+export type ParseFields<S extends string> =
     ParseField<S> extends ParseSuccess<infer Field, infer R0> ? (
         ParseFieldSeparator<R0> extends ParseSuccess<any, infer R1> ? (
             ParseFields<R1> extends ParseSuccess<infer Fields, infer R2, any[]> ? (
@@ -30,10 +30,19 @@ type ParseFields<S extends string> =
         ) : ParseSuccess<[Field], R0>
     ) : ParseSuccess<[], S>;
 
-type ParseField<S extends string> = ParseFail;
+// TODO: Make this actually correct
+type ParseField<S extends string> =
+    S extends `${infer H}, ${infer R}` ? ParseSuccess<FieldSpecifier<Identifier<H>, Identifier<H>>, `, ${R}`> :
+    S extends `${infer H} ${infer R}` ? ParseSuccess<FieldSpecifier<Identifier<H>, Identifier<H>>, ` ${R}`> :
+    ParseSuccess<FieldSpecifier<Identifier<S>, Identifier<S>>, ''>;
+
 // TODO: Make this more robust
 type ParseFieldSeparator<S extends string> = ParseString<', ', S>;
-type ParseFromItem<S extends string> = ParseFail;
+
+type ParseFromItem<S extends string> =
+    S extends `${infer H} ${infer R}` ? ParseSuccess<TableSpecifier<Identifier<H>, Identifier<H>>, ` ${R}`> :
+    ParseSuccess<TableSpecifier<Identifier<S>, Identifier<S>>, ''>;
+
 type ParseWhere<S extends string> =
     ParseStringCaseInsensitive<' WHERE ', S> extends ParseSuccess<any, infer R0> ? (
         ParseExpression<R0>

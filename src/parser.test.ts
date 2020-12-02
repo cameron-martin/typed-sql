@@ -1,10 +1,21 @@
-import { Parse } from './parser';
+import { Parse, ParseFields } from './parser';
 import { expectType, TypeOf, TypeEqual } from "ts-expect";
 import { FieldSpecifier, SelectStatement, Identifier, TableSpecifier, BooleanLiteral, BinaryExpression, StringLiteral } from './ast';
+import { ParseSuccess } from './parser-library';
+
+test('ParseFields', () => {
+    type Result = ParseFields<"id, name FROM users">;
+    type Expected = ParseSuccess<[
+        FieldSpecifier<Identifier<"id">, Identifier<"id">>,
+        FieldSpecifier<Identifier<"name">, Identifier<"name">>,
+    ], ' FROM users'>;
+
+    expectType<TypeEqual<Result, Expected>>(true);
+});
 
 test('simple select statement', () => {
     type Result = Parse<"SELECT id, name FROM users">;
-    type Expected = SelectStatement<
+    type Expected = ParseSuccess<SelectStatement<
         [
             FieldSpecifier<Identifier<"id">, Identifier<"id">>,
             FieldSpecifier<Identifier<"name">, Identifier<"name">>,
@@ -12,9 +23,9 @@ test('simple select statement', () => {
         TableSpecifier<Identifier<"users">, Identifier<"users">>,
         [],
         BooleanLiteral<true>,
-        number, // TODO: Fix this (should be 0)
-        number | null // TODO: Fix this (should be null)
-    >;
+        0, // TODO: Fix this (should be 0)
+        null // TODO: Fix this (should be null)
+    >, ''>;
 
     expectType<TypeEqual<Result, Expected>>(true);
 });
