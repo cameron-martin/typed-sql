@@ -3,25 +3,25 @@ export type Identifier<Name extends string = string> = {
   name: Name;
 };
 
-export type MemberExpression<
-  Object extends string = string,
-  Property extends string = string
+export type ColumnReference<
+  Correlation extends Expression | null = Expression | null,
+  ColumnName extends string = string
 > = {
-  type: "MemberExpression";
-  object: Object;
-  property: Property;
+  type: "ColumnReference";
+  correlation: Correlation;
+  columnName: ColumnName;
 };
 
 export type NumericLiteral<Value extends number = number> = {
   type: "NumericLiteral";
   value: Value;
 };
-export type StringLiteral<Value extends string = string> = {
-  type: "StringLiteral";
+export type StringConstant<Value extends string = string> = {
+  type: "StringConstant";
   value: Value;
 };
-export type BooleanLiteral<Value extends boolean = boolean> = {
-  type: "BooleanLiteral";
+export type BooleanConstant<Value extends boolean = boolean> = {
+  type: "BooleanConstant";
   value: Value;
 };
 
@@ -52,8 +52,8 @@ export type LogicalExpression<
 };
 
 export type FieldSpecifier<
-  Source extends Identifier | MemberExpression = Identifier,
-  Alias extends Identifier = Identifier
+  Source extends ColumnReference = ColumnReference,
+  Alias extends string | null = null
 > = {
   type: "FieldSpecifier";
   source: Source;
@@ -83,9 +83,12 @@ export type Expression =
   | BinaryExpression<any, BinaryOperator, any>
   | MemberExpression
   | Identifier
-  | StringLiteral
+  | Constant;
+
+export type Constant =
+  | StringConstant
   | NumericLiteral
-  | BooleanLiteral
+  | BooleanConstant
   | NullLiteral;
 
 export type InnerJoinSpecifier<

@@ -1,13 +1,13 @@
 import { Parse, ParseFields } from './parser';
-import { expectType, TypeOf, TypeEqual } from "ts-expect";
-import { FieldSpecifier, SelectStatement, Identifier, TableSpecifier, BooleanLiteral, BinaryExpression, StringLiteral } from './ast';
-import { ParseSuccess } from './parser-library';
+import { expectType, TypeEqual } from "ts-expect";
+import { FieldSpecifier, SelectStatement, Identifier, TableSpecifier, BooleanConstant, BinaryExpression, StringConstant, ColumnReference } from './ast';
+import { ParseFail, ParseSuccess } from './parser-library';
 
 test('ParseFields', () => {
     type Result = ParseFields<"id, name FROM users">;
     type Expected = ParseSuccess<[
-        FieldSpecifier<Identifier<"id">, Identifier<"id">>,
-        FieldSpecifier<Identifier<"name">, Identifier<"name">>,
+        FieldSpecifier<ColumnReference<null, "id">>,
+        FieldSpecifier<ColumnReference<null, "name">>,
     ], ' FROM users'>;
 
     expectType<TypeEqual<Result, Expected>>(true);
@@ -17,14 +17,32 @@ test('simple select statement', () => {
     type Result = Parse<"SELECT id, name FROM users">;
     type Expected = ParseSuccess<SelectStatement<
         [
-            FieldSpecifier<Identifier<"id">, Identifier<"id">>,
-            FieldSpecifier<Identifier<"name">, Identifier<"name">>,
+            FieldSpecifier<ColumnReference<null, "id">>,
+            FieldSpecifier<ColumnReference<null, "name">>,
         ],
         TableSpecifier<Identifier<"users">, Identifier<"users">>,
         [],
-        BooleanLiteral<true>,
-        0, // TODO: Fix this (should be 0)
-        null // TODO: Fix this (should be null)
+        BooleanConstant<true>,
+        0,
+        null
+    >, ''>;
+
+    expectType<TypeEqual<Result, Expected>>(true);
+});
+
+
+test('select statement with column reference field selection', () => {
+    type Result = Parse<"SELECT users.id, users.name FROM users">;
+    type Expected = ParseSuccess<SelectStatement<
+        [
+            FieldSpecifier<ColumnReference<Identifier<"users">, "id">>,
+            FieldSpecifier<ColumnReference<Identifier<"users">, "name">>,
+        ],
+        TableSpecifier<Identifier<"users">, Identifier<"users">>,
+        [],
+        BooleanConstant<true>,
+        0,
+        null
     >, ''>;
 
     expectType<TypeEqual<Result, Expected>>(true);
@@ -32,19 +50,34 @@ test('simple select statement', () => {
 
 test('select statement with where clause', () => {
     type Result = Parse<'SELECT id, name FROM users WHERE name = "hello"'>;
-    type Test1 = Result['where']
-    type Test2 = Expected['where']
     type Expected = SelectStatement<
         [
-            FieldSpecifier<Identifier<"id">, Identifier<"id">>,
-            FieldSpecifier<Identifier<"name">, Identifier<"name">>,
+            FieldSpecifier<ColumnReference<null, "id">>,
+            FieldSpecifier<ColumnReference<null, "name">>,
         ],
         TableSpecifier<Identifier<"users">, Identifier<"users">>,
         [],
-        BinaryExpression<Identifier<"name">, "=", StringLiteral<"hello">>,
+        BinaryExpression<Identifier<"name">, "=", StringConstant<"hello">>,
         0,
         null
     >;
+
+    expectType<TypeEqual<Result, Expected>>(true);
+});
+
+test('select statement with constant where clause', () => {
+    type Result = Parse<'SELECT id, name FROM users WHERE true'>;
+    type Expected = ParseSuccess<SelectStatement<
+        [
+            FieldSpecifier<ColumnReference<null, "id">>,
+            FieldSpecifier<ColumnReference<null, "name">>,
+        ],
+        TableSpecifier<Identifier<"users">, Identifier<"users">>,
+        [],
+        BooleanConstant<true>,
+        0,
+        null
+    >, ''>;
 
     expectType<TypeEqual<Result, Expected>>(true);
 });

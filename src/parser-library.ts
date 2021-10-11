@@ -65,18 +65,13 @@ type FailIfYields<ParseResult, X> = ParseResult extends ParseSuccess<X, any> ? P
 /**
  * Parse a string literal in single or double quotes, with backslash-escaping
  */
-export type ParseStringLiteral<S extends string> =
-  ParseStringLiteralWithQuote<"'", S> extends ParseSuccess<infer X, infer R> ? ParseSuccess<X, R> :
-  ParseStringLiteralWithQuote<'"', S> extends ParseSuccess<infer X, infer R> ? ParseSuccess<X, R> :
-  ParseFail;
-
-type ParseStringLiteralWithQuote<Quote extends string, S extends string> =
+export type ParseStringLiteral<Quote extends string, Escape extends string, S extends string> =
   S extends `${Quote}${infer R0}`
-  ? ParseInsideStringLiteralWithQuote<Quote, R0>
+  ? ParseInsideStringLiteral<Quote, Escape, R0>
   : ParseFail;
 
-type ParseInsideStringLiteralWithQuote<Quote extends string, S extends string> =
+type ParseInsideStringLiteral<Quote extends string, Escape extends string, S extends string> =
   S extends `${Quote}${infer R0}` ? ParseSuccess<'', R0> :
-  S extends `\\${infer X0}${infer R0}` ? (ParseInsideStringLiteralWithQuote<Quote, R0> extends ParseSuccess<infer X1, infer R1, string> ? ParseSuccess<`${X0}${X1}`, R1> : ParseFail) :
-  S extends `${infer X0}${infer R0}` ? (ParseInsideStringLiteralWithQuote<Quote, R0> extends ParseSuccess<infer X1, infer R1, string> ? ParseSuccess<`${X0}${X1}`, R1> : ParseFail) :
+  S extends `${Escape}${infer X0}${infer R0}` ? (ParseInsideStringLiteral<Quote, Escape, R0> extends ParseSuccess<infer X1, infer R1, string> ? ParseSuccess<`${X0}${X1}`, R1> : ParseFail) :
+  S extends `${infer X0}${infer R0}` ? (ParseInsideStringLiteral<Quote, Escape, R0> extends ParseSuccess<infer X1, infer R1, string> ? ParseSuccess<`${X0}${X1}`, R1> : ParseFail) :
   ParseFail;

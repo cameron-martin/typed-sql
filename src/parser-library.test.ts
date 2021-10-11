@@ -25,83 +25,46 @@ describe('ParseMany', () => {
         expectType<TypeEqual<Result, Expected>>(true);
     });
 
-    // it('parses and consumes all whitespace characters from start of string', () => {
-    //     type Result = ParseMany<Whitespace, " foo bar">;
-    //     type Expected = ParseSuccess<" ", "foo bar">;
+    it('parses and consumes all whitespace characters from start of string', () => {
+        type Result = ParseMany<Whitespace, " foo bar">;
+        type Expected = ParseSuccess<" ", "foo bar">;
     
-    //     expectType<TypeEqual<Result, Expected>>(true);
-    // });
+        expectType<TypeEqual<Result, Expected>>(true);
+    });
 });
 
 describe('ParseStringLiteral', () => {
     describe('single quotes', () => {
         it('parses empty string with no remainder', () => {
-            type Result = ParseStringLiteral<"''">;
+            type Result = ParseStringLiteral<"'", '\\', "''">;
             type Expected = ParseSuccess<"", "">;
         
             expectType<TypeEqual<Result, Expected>>(true);
         });
 
         it('parses empty string with remainder', () => {
-            type Result = ParseStringLiteral<"'' foo">;
+            type Result = ParseStringLiteral<"'", '\\', "'' foo">;
             type Expected = ParseSuccess<"", " foo">;
         
             expectType<TypeEqual<Result, Expected>>(true);
         });
 
         it('parses simple string', () => {
-            type Result = ParseStringLiteral<"'foo' bar">;
+            type Result = ParseStringLiteral<"'", '\\', "'foo' bar">;
             type Expected = ParseSuccess<"foo", " bar">;
         
             expectType<TypeEqual<Result, Expected>>(true);
         });
 
         it('parses string with escaped quote', () => {
-            type Result = ParseStringLiteral<"'foo\\'' bar">;
+            type Result = ParseStringLiteral<"'", '\\', "'foo\\'' bar">;
             type Expected = ParseSuccess<"foo'", " bar">;
         
             expectType<TypeEqual<Result, Expected>>(true);
         });
 
         it('parses string with escaped non-quote value', () => {
-            type Result = ParseStringLiteral<"'fo\\o' bar">;
-            type Expected = ParseSuccess<"foo", " bar">;
-        
-            expectType<TypeEqual<Result, Expected>>(true);
-        });
-    });
-
-    describe('double quotes', () => {
-        it('parses empty string with no remainder', () => {
-            type Result = ParseStringLiteral<'""'>;
-            type Expected = ParseSuccess<"", "">;
-        
-            expectType<TypeEqual<Result, Expected>>(true);
-        });
-
-        it('parses empty string with remainder', () => {
-            type Result = ParseStringLiteral<'"" foo'>;
-            type Expected = ParseSuccess<"", " foo">;
-        
-            expectType<TypeEqual<Result, Expected>>(true);
-        });
-
-        it('parses simple string', () => {
-            type Result = ParseStringLiteral<'"foo" bar'>;
-            type Expected = ParseSuccess<"foo", " bar">;
-        
-            expectType<TypeEqual<Result, Expected>>(true);
-        });
-
-        it('parses string with escaped quote', () => {
-            type Result = ParseStringLiteral<'"foo\\"" bar'>;
-            type Expected = ParseSuccess<"foo\"", " bar">;
-        
-            expectType<TypeEqual<Result, Expected>>(true);
-        });
-
-        it('parses string with escaped non-quote value', () => {
-            type Result = ParseStringLiteral<'"fo\\o" bar'>;
+            type Result = ParseStringLiteral<"'", '\\', "'fo\\o' bar">;
             type Expected = ParseSuccess<"foo", " bar">;
         
             expectType<TypeEqual<Result, Expected>>(true);
@@ -109,7 +72,7 @@ describe('ParseStringLiteral', () => {
     });
 
     it('does not parse mixed quotes', () => {
-        type Result = ParseStringLiteral<'"foo\' bar'>;
+        type Result = ParseStringLiteral<'"', '\\', '"foo\' bar'>;
         type Expected = ParseFail;
     
         expectType<TypeEqual<Result, Expected>>(true);
